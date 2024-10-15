@@ -1,56 +1,84 @@
-// src/pages/Home.tsx
-import { useState } from 'react';
-import Navbar from '../components/Navbar';
-import ProductCard from '../components/ProductCard';
-import Pagination from '../components/Pagination';
-import Footer from '../components/Footer';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import ProductCard from '../components/ProductCard'; // Certifique-se de ter o componente ProductCard
 
-const allProducts = [
-  { id: 1, name: 'Produto 1', price: '$20.00', image: 'https://via.placeholder.com/150' },
-  { id: 2, name: 'Produto 2', price: '$30.00', image: 'https://via.placeholder.com/150' },
-  { id: 3, name: 'Produto 3', price: '$40.00', image: 'https://via.placeholder.com/150' },
-  { id: 4, name: 'Produto 4', price: '$50.00', image: 'https://via.placeholder.com/150' },
-  { id: 5, name: 'Produto 5', price: '$60.00', image: 'https://via.placeholder.com/150' },
-  { id: 6, name: 'Produto 6', price: '$70.00', image: 'https://via.placeholder.com/150' },
-  { id: 7, name: 'Produto 7', price: '$80.00', image: 'https://via.placeholder.com/150' },
-  { id: 8, name: 'Produto 8', price: '$90.00', image: 'https://via.placeholder.com/150' },
-  { id: 9, name: 'Produto 9', price: '$100.00', image: 'https://via.placeholder.com/150' },
-  { id: 10, name: 'Produto 10', price: '$110.00', image: 'https://via.placeholder.com/150' },
-  { id: 11, name: 'Produto 11', price: '$120.00', image: 'https://via.placeholder.com/150' },
-  { id: 12, name: 'Produto 12', price: '$130.00', image: 'https://via.placeholder.com/150' },
-];
+interface Product {
+  id: number;
+  title: string;
+  description: string;
+  unit_price: number;
+}
 
 const Home = () => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 10;  // Mostrar 10 produtos por página
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [nextPage, setNextPage] = useState<string | null>(null);
+  const [previousPage, setPreviousPage] = useState<string | null>(null);
 
-  // Calcular produtos da página atual
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = allProducts.slice(indexOfFirstProduct, indexOfLastProduct);
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+  // Função para buscar produtos de uma URL específica (para lidar com a paginação)
+  const fetchProducts = (url: string) => {
+    axios.get(url)
+      .then(response => {
+        console.log('Dados da API:', response.data);  // Verifique os dados no console
+        setProducts(response.data.results);  // Atualiza o estado com os produtos da página
+        setNextPage(response.data.next);  // Link para a próxima página
+        setPreviousPage(response.data.previous);  // Link para a página anterior
+        setLoading(false);  // Desativa o estado de carregamento
+      })
+      .catch(error => {
+        console.error('Erro ao buscar produtos:', error);  // Log do erro no console
+        setError('Erro ao buscar produtos');
+        setLoading(false);
+      });
   };
 
+  // O useEffect inicial busca os produtos da primeira página
+  useEffect(() => {
+    fetchProducts('http://127.0.0.1:8000/store/products/');
+  }, []);
+
+  // Se estiver carregando, exibe a mensagem de carregamento
+  if (loading) {
+    return <p>Carregando produtos...</p>;
+  }
+
+  // Se houver um erro, exibe a mensagem de erro
+  if (error) {
+    return <p>{error}</p>;
+  }
+
   return (
-    <div className="flex flex-col min-h-screen">
-      <Navbar />
-      <main className="container mx-auto flex-1 py-8">
-        <h2 className="text-3xl font-bold mb-6">Produtos em Destaque</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {currentProducts.map(product => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-        <Pagination
-          totalProducts={allProducts.length}
-          productsPerPage={productsPerPage}
-          currentPage={currentPage}
-          onPageChange={handlePageChange}
-        />
-      </main>
-      <Footer />
+    <div className="container mx-auto">
+      <h2 className="text-3xl font-bold mb-6">Produtos em Destaque</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {products.map(product => (
+          <ProductCard
+            key={product.id}
+            product={product}
+          />
+        ))}
+      </div>
+
+      {/* Paginação: Botões para navegar entre páginas */}
+      <div className="flex justify-between mt-6">
+        {previousPage && (
+          <button
+            onClick={() => fetchProducts(previousPage)}
+            className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
+          >
+            Página Anterior
+          </button>
+        )}
+        {nextPage && (
+          <button
+            onClick={() => fetchProducts(nextPage)}
+            className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
+          >
+            Próxima Página
+          </button>
+        )}
+      </div>
     </div>
   );
 };
