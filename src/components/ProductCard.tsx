@@ -5,7 +5,7 @@ interface ProductCardProps {
     title: string;
     description: string;
     unit_price: number;
-    image_url: string;  // Certifique-se de ter o campo de imagem
+    image_url: string;  
   };
 }
 
@@ -13,7 +13,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col">
       <img
-        src={product.image_url || 'https://via.placeholder.com/150'} // Imagem do produto ou placeholder
+        src={product.image_url || 'https://via.placeholder.com/150'} 
         alt={product.title}
         className="w-full h-48 object-cover"
       />

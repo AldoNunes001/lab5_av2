@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
 import ProductCard from '../components/ProductCard';
-import Pagination from '../components/Pagination'; // Novo componente
+import Pagination from '../components/Pagination'; 
 
 interface Product {
   id: number;
@@ -49,7 +47,6 @@ const Home = () => {
 
   return (
     <div>
-      {/* <Navbar /> Navbar */}
       
       <div className="container mx-auto">
         <h2 className="text-3xl font-bold mb-6">Produtos em Destaque</h2>
@@ -70,7 +67,6 @@ const Home = () => {
         />
       </div>
       
-      <Footer /> {/* Footer */}
     </div>
   );
 };

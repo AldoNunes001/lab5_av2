@@ -2,15 +2,17 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from './pages/Home';
 import Products from './pages/Products';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 
 const App = () => {
   return (
     <Router>
-      <Navbar /> {/* Navbar agora está fora das rotas para aparecer em todas as páginas */}
+      <Navbar /> 
       <Routes>
-        <Route path="/" element={<Home />} /> {/* Rota para a Home */}
-        <Route path="/products" element={<Products />} /> {/* Rota para a página de produtos */}
+        <Route path="/" element={<Home />} /> 
+        <Route path="/products" element={<Products />} /> 
       </Routes>
+      <Footer /> 
     </Router>
   );
 };
